@@ -6,6 +6,7 @@ function r = pagerank_powermethod(names, G, gamma, resultsbase, capturedata)
 % Uses names (SNPs) and adjacency matrix G produced by parsefile,
 % together with a damping factory gamma, (default is .85), to compute and plot
 % a bar graph of page rank, and print the dominant SNPs in rank order.
+% Returns the final SNPRank score vector r
 
 % Set defaults for optional params
 if nargin < 5
@@ -14,12 +15,13 @@ if nargin < 5
     capturedata = false;
 end
 
-% G diagonal is information gain.  
+% G diagonal is information gain  
 Gdiag = diag(G);
 % Sum of diagonal elements
 Gtrace = sum(Gdiag);
 
-% colsum = out-degree, rowsum = in-degree
+% colsum = out-degree, rowsum = in-degree (in undirected graphs
+% out-degrees = in-degree)
 [n,n] = size(G);
 colsum = sum(G, 1);  % 1 x n (row) vector of column sums
 rowsum = sum(G, 2);  % n x 1 (column) vector of row sums
