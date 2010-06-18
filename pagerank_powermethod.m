@@ -23,20 +23,26 @@ Gtrace = sum(Gdiag);
 % colsum = out-degree, rowsum = in-degree (in undirected graphs
 % out-degrees = in-degree)
 [n,n] = size(G);
-colsum = sum(G, 1);  % 1 x n (row) vector of column sums
-rowsum = sum(G, 2);  % n x 1 (column) vector of row sums
+% 1 x n (row) vector of column sums (d_j in Eqs. 4, 5 from SNPRank paper)
+colsum = sum(G, 1);  
+% n x 1 (column) vector of row sums
+rowsum = sum(G, 2);  
 
-% indices of colsum vector that are non-zero, zero 
+% indices of colsum vector that are non-zero
 colsum_nzidx = find(colsum ~= 0);  
-colsum_zidx = find(colsum == 0);  
 
 % n x n sparse matrix with values 1/colsum for nonzero elements of colsum 
 % indices given by colsum_nzidx).  Other elements are zero.
-D = sparse(colsum_nzidx, colsum_nzidx, Gtrace ./ colsum(colsum_nzidx), n, n);  
+D = sparse(colsum_nzidx, colsum_nzidx, 1 ./ colsum(colsum_nzidx), n, n);  
 
+% initialize second term multiplier as a column vector of 1s
+T_nz = ones(1, n);
+% non-zero elements of colsum/d_j have (1 - gamma) in the numerator of the 
+% second term (Eq. 5 from SNPRank paper)
+T_nz(colsum_nzidx) = 1 - gamma;
 % compute initial T, Markov chain transition matrix
-z_T(colsum_nzidx) = 1 - gamma;
-T = (gamma * G * D + Gdiag * z_T) / Gtrace;
+% first term (gamma * G * D) is zero when d_j = 0
+T = (gamma * G * D) + (Gdiag * T_nz) / Gtrace;
 
 % iterate power method
 unit = ones(n, 1); % column vector of 1s
