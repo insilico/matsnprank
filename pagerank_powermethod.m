@@ -2,7 +2,7 @@ function r = pagerank_powermethod(datafile, gamma, capturedata)
 % SNPRank - SNP ranking algorithm
 
 % Uses SNP names (SNPs) and adjacency matrix G produced by parsefile,
-% together with a damping factory gamma, (default is .85), to compute 
+% together with a damping factor gamma, (default is .85), to compute 
 % SNPRank scores.
 % Returns the final SNPRank score vector r, in same order as original 
 % data matrix/SNP names
@@ -19,7 +19,7 @@ end
 
 % Use file prefix (everything preceding .ext) for saved data files
 namesplit = regexp(datafile, '\....$', 'split', 'stringanchors');
-resultsbase = namesplit(1);
+resultsbase = char(namesplit(1));
 
 % Parse data matrix file, store headers (SNPs) and data as vars
 [SNPs, G] = parsefile(datafile);
@@ -30,7 +30,7 @@ Gdiag = diag(G);
 Gtrace = sum(Gdiag);
 
 % colsum = out-degree, rowsum = in-degree (in undirected graphs
-% out-degrees = in-degree)
+% out-degree = in-degree)
 [n,n] = size(G);
 
 % 1 x n (row) vector of column sums (d_j in Eqs. 4, 5 from SNPRank paper)
@@ -87,7 +87,7 @@ figure(2)
 scorevdeg = scatter(rowsum, r);
 xlabel('degree');
 ylabel('SNPRank score');
-title([resultsbase ' score vs. degree, gamma = ' num2str(gamma)])
+title([strrep(resultsbase,'_', '\_') ' score vs. degree, gamma = ' num2str(gamma)])
 if capturedata
     saveas(scorevdeg, [resultsbase '-degree-scatter' num2str(gamma) '.eps'], 'psc2')
 end
@@ -97,7 +97,7 @@ figure(3)
 scorevig = scatter(Gdiag, r);
 xlabel('Information gain (IG)');
 ylabel('SNPRank score');
-title([resultsbase ' score vs. IG, gamma = ' num2str(gamma)])
+title([strrep(resultsbase,'_', '\_') ' score vs. IG, gamma = ' num2str(gamma)])
 if capturedata
     saveas(scorevig, [resultsbase '-IG-scatter' num2str(gamma) '.eps'], 'psc2')
 end
