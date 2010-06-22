@@ -7,7 +7,7 @@ function r = snprank(datafile, gamma, capturedata)
 % Returns the final SNPRank score vector r, in same order as original 
 % data matrix/SNP names
 %
-% Usage:  pagerank_powermethod('gain-matrix.txt');
+% Usage:  snprank('gain-matrix.txt');
 % Authors:  Brett McKinney and Nick Davis
 % Email:  brett.mckinney@gmail.com, nick@nickdavis.name
 
@@ -59,12 +59,17 @@ T = (gamma * G * D) + (Gdiag * T_nz) / Gtrace;
 % iterate power method
 unit = ones(n, 1); % column vector of 1s
 r = unit / n; % initial arbitrary vector
-for i=1:5
+threshold = 10^-4; % cutoff for matrix convergence
+converged = 0;
+while ~converged
+    r_old = r;
     r = T * r;
     lambda = sum(r);  % temporary eigenvalue
     r = r / lambda;     % Normalize eivenvector so that sum(r) == 1.
+    if abs(r - r_old) < threshold
+        converged = 1;
+    end
 end
-
 % Bar graph of SNPRank, with labels for top SNPs
 figure(1)
 h = bar(r);
