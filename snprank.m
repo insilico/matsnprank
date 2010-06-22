@@ -1,4 +1,4 @@
-function r = pagerank_powermethod(datafile, gamma, capturedata)
+function r = snprank(datafile, gamma, capturedata)
 % SNPRank - SNP ranking algorithm
 
 % Uses SNP names (SNPs) and adjacency matrix G produced by parsefile,
