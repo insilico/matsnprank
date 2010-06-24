@@ -29,10 +29,11 @@ Gdiag = diag(G);
 % Sum of diagonal elements
 Gtrace = sum(Gdiag);
 
-% colsum = out-degree, rowsum = in-degree (in undirected graphs
-% out-degree = in-degree)
+% dimensions of data matrix
 [n,n] = size(G);
 
+% colsum = out-degree, rowsum = in-degree (in undirected graphs
+% out-degree = in-degree)
 % 1 x n (row) vector of column sums (d_j in Eqs. 4, 5 from SNPRank paper)
 colsum = sum(G, 1);  
 % n x 1 (column) vector of row sums
@@ -45,7 +46,7 @@ colsum_nzidx = find(colsum ~= 0);
 % indices given by colsum_nzidx).  Other elements are zero.
 D = sparse(colsum_nzidx, colsum_nzidx, 1 ./ colsum(colsum_nzidx), n, n);  
 
-% initialize second term multiplier as a column vector of 1s
+% initialize second term multiplier as a row vector of 1s
 T_nz = ones(1, n);
 
 % non-zero elements of colsum/d_j have (1 - gamma) in the numerator of the 
