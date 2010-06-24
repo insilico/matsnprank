@@ -1,9 +1,9 @@
 function r = snprank(datafile, gamma, capturedata)
-% SNPRank - SNP ranking algorithm
+% SNPrank - SNP ranking algorithm
 
 % Uses SNP names (SNPs) and adjacency matrix G produced by parsefile,
 % together with a damping factor gamma, (default is .85), to compute 
-% SNPRank scores.
+% SNPrank scores.
 % Returns the final SNPRank score vector r, in same order as original 
 % data matrix/SNP names
 %
@@ -71,11 +71,11 @@ while ~converged
         converged = 1;
     end
 end
-% Bar graph of SNPRank, with labels for top SNPs
+% Bar graph of SNPrank, with labels for top SNPs
 figure(1)
 h = bar(r);
 title('SNPRank scores')
-% Capture top 10 SNPs by SNPRank, label vertically on bar graph
+% Capture top 10 SNPs by SNPrank, label vertically on bar graph
 [sortedranks, snpindices] = sort(r, 'descend');
 topsnps = sortedranks(1:10);
 topindices = snpindices(1:10);
@@ -88,7 +88,7 @@ if capturedata
     saveas(h, [resultsbase '-bar' num2str(gamma) '.eps'], 'psc2');
 end
 
-% Scatter plot of SNPRank score vs. node degree
+% Scatter plot of SNPrank score vs. node degree
 figure(2)
 scorevdeg = scatter(rowsum, r);
 xlabel('degree');
@@ -98,7 +98,7 @@ if capturedata
     saveas(scorevdeg, [resultsbase '-degree-scatter' num2str(gamma) '.eps'], 'psc2')
 end
 
-% Scatter plot of SNPRank score vs. information gain (IG)
+% Scatter plot of SNPrank score vs. information gain (IG)
 figure(3)
 scorevig = scatter(Gdiag, r);
 xlabel('Information gain (IG)');
