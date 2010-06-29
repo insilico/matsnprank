@@ -1,11 +1,11 @@
-function r = snprank(datafile, gamma, capturedata)
+function snprank(datafile, gamma, capturedata)
 % SNPrank - SNP ranking algorithm
 
 % Uses SNP names (SNPs) and adjacency matrix G produced by parsefile,
 % together with a damping factor gamma, (default is .85), to compute 
 % SNPrank scores.
-% Returns the final SNPRank score vector r, in same order as original 
-% data matrix/SNP names
+% Prints a series of rows containing the SNP name, SNPrank score,
+% information gain, and degree, sorted in descending order by SNPrank.
 %
 % Usage:  snprank('gain-matrix.txt');
 % Authors:  Brett McKinney and Nick Davis
@@ -32,12 +32,9 @@ Gtrace = sum(Gdiag);
 % dimensions of data matrix
 [n,n] = size(G);
 
-% colsum = out-degree, rowsum = in-degree (in undirected graphs
-% out-degree = in-degree)
+% colsum = degree of each SNP(in undirected graphs, out-degree = in-degree)
 % 1 x n (row) vector of column sums (d_j in Eqs. 4, 5 from SNPRank paper)
 colsum = sum(G, 1);  
-% n x 1 (column) vector of row sums
-rowsum = sum(G, 2);  
 
 % indices of colsum vector that are non-zero
 colsum_nzidx = find(colsum ~= 0);  
@@ -90,7 +87,7 @@ end
 
 % Scatter plot of SNPrank score vs. node degree
 figure(2)
-scorevdeg = scatter(rowsum, r);
+scorevdeg = scatter(colsum, r);
 xlabel('degree');
 ylabel('SNPRank score');
 title([strrep(resultsbase,'_', '\_') ' score vs. degree, gamma = ' num2str(gamma)])
@@ -114,11 +111,11 @@ if capturedata
     fid = fopen([resultsbase '-' num2str(gamma) '.txt'], 'w');
 end
 [~,q] = sort(-r);
-fprintf(fid,'SNP \t snp-rank \t IG (main effect) \t in \t out\n');
+fprintf(fid,'SNP\tSNPrank\tIG (main effect)\tdegree\n');
 for k = 1:n
   j = q(k);
-  fprintf(fid,'%s \t %8.4f \t %8.4f \t %4.0f \t %4.0f \t \n', ...
-     SNPs{j}, r(j), G(j,j), rowsum(j), colsum(j));
+  fprintf(fid,'%s\t%8.4f\t%8.4f\t %4.0f\n', ...
+     SNPs{j}, r(j), G(j,j), colsum(j));
 end
 if capturedata
     fclose(fid);
