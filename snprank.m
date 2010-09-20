@@ -1,4 +1,4 @@
-function snprank(datafile, gamma, capturedata, showgraphs)
+function snprank(datafile, gamma, capturedata, showgraphs, usegpu)
 % SNPrank - SNP ranking algorithm
 
 % Uses SNP names (SNPs) and adjacency matrix G, together with a 
@@ -7,15 +7,17 @@ function snprank(datafile, gamma, capturedata, showgraphs)
 % information gain, sorted in descending order by SNPrank.
 %
 % Usage:  snprank('gain-matrix.txt');
-% Authors:  Brett McKinney and Nick Davis
-% Email:  brett.mckinney@gmail.com, nick@nickdavis.name
+% Authors:  Brett McKinney, Nick Davis, and Ahwan Pandey
+% Email:  brett.mckinney@gmail.com, nick@nickdavis.name, 
+%         ahwan-pandey@utulsa.edu
 
 % Set defaults for optional params, don't write results files or show
-% graphs
+% graphs, don't use GPU
 if nargin < 4
     gamma = .85;
     capturedata = false;
     showgraphs = false;
+	usegpu = false;
 end
 
 % Use file prefix (everything preceding .ext) for saved data files
@@ -44,7 +46,14 @@ colsum_nzidx = find(colsum ~= 0);
 
 % n x n sparse matrix with values 1/colsum for nonzero elements of colsum 
 % indices given by colsum_nzidx).  Other elements are zero.
-D = sparse(colsum_nzidx, colsum_nzidx, 1 ./ colsum(colsum_nzidx), n, n);  
+if usegpu
+	D = zeros(n);
+	for i = colsum_nzidx
+		D(i,i) = 1 / colsum(colsum_nzidx(i));
+	end
+else
+	D = sparse(colsum_nzidx, colsum_nzidx, 1 ./ colsum(colsum_nzidx), n, n);  
+end
 
 % initialize second term multiplier as a row vector of 1s
 T_nz = ones(1, n);
@@ -55,7 +64,14 @@ T_nz(colsum_nzidx) = 1 - gamma;
 
 % compute initial T, Markov chain transition matrix
 % first term (gamma * G * D) is zero when d_j = 0
-T = (gamma * G * D) + (Gdiag * T_nz) / Gtrace;
+if usegpu
+	G_gpu = gsingle(G);
+	D_gpu = gsingle(D);
+	mult_in_gpu = G_gpu * D_gpu;
+	T = (gamma * single(mult_in_gpu)) + (Gdiag * T_nz) / Gtrace;
+else
+	T = (gamma * G * D) + (Gdiag * T_nz) / Gtrace;
+end
 
 % iterate power method
 unit = ones(n, 1); % column vector of 1s
