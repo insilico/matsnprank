@@ -1,4 +1,4 @@
-function snprank(datafile, gamma, capturedata)
+function snprank(datafile, gamma, capturedata, showgraphs)
 % SNPrank - SNP ranking algorithm
 
 % Uses SNP names (SNPs) and adjacency matrix G produced by parsefile,
@@ -11,10 +11,12 @@ function snprank(datafile, gamma, capturedata)
 % Authors:  Brett McKinney and Nick Davis
 % Email:  brett.mckinney@gmail.com, nick@nickdavis.name
 
-% Set defaults for optional params
-if nargin < 3
+% Set defaults for optional params, don't write results files or show
+% graphs
+if nargin < 4
     gamma = .85;
     capturedata = false;
+    showgraphs = false;
 end
 
 % Use file prefix (everything preceding .ext) for saved data files
@@ -22,7 +24,9 @@ namesplit = regexp(datafile, '\....$', 'split', 'stringanchors');
 resultsbase = char(namesplit(1));
 
 % Parse data matrix file, store headers (SNPs) and data as vars
-[SNPs, G] = parsefile(datafile);
+dataclass = importdata(datafile);
+SNPs = dataclass.colheaders;
+G = dataclass.data;
 
 % G diagonal is information gain  
 Gdiag = diag(G);
@@ -68,41 +72,44 @@ while ~converged
         converged = 1;
     end
 end
-% Bar graph of SNPrank, with labels for top SNPs
-figure(1)
-h = bar(r);
-title('SNPRank scores')
-% Capture top 10 SNPs by SNPrank, label vertically on bar graph
-[sortedranks, snpindices] = sort(r, 'descend');
-topsnps = sortedranks(1:10);
-topindices = snpindices(1:10);
-for i=1:length(topindices)
-    % need to replace _ with \_ so Matlab doesn't subscript the labels
-    text(topindices(i), topsnps(i),strrep(SNPs(topindices(i)),'_', '\_'), 'Rotation', 90)
-end
-% Only save figures and data to file if capturedata is set
-if capturedata
-    saveas(h, [resultsbase '-bar' num2str(gamma) '.eps'], 'psc2');
-end
 
-% Scatter plot of SNPrank score vs. node degree
-figure(2)
-scorevdeg = scatter(colsum, r);
-xlabel('degree');
-ylabel('SNPRank score');
-title([strrep(resultsbase,'_', '\_') ' score vs. degree, gamma = ' num2str(gamma)])
-if capturedata
-    saveas(scorevdeg, [resultsbase '-degree-scatter' num2str(gamma) '.eps'], 'psc2')
-end
+if showgraphs
+    % Bar graph of SNPrank, with labels for top SNPs
+    figure(1)
+    h = bar(r);
+    title('SNPRank scores')
+    % Capture top 10 SNPs by SNPrank, label vertically on bar graph
+    [sortedranks, snpindices] = sort(r, 'descend');
+    topsnps = sortedranks(1:10);
+    topindices = snpindices(1:10);
+    for i=1:length(topindices)
+        % need to replace _ with \_ so Matlab doesn't subscript the labels
+        text(topindices(i), topsnps(i),strrep(SNPs(topindices(i)),'_', '\_'), 'Rotation', 90)
+    end
+    % Only save figures and data to file if capturedata is set
+    if capturedata
+        saveas(h, [resultsbase '-bar' num2str(gamma) '.eps'], 'psc2');
+    end
 
-% Scatter plot of SNPrank score vs. information gain (IG)
-figure(3)
-scorevig = scatter(Gdiag, r);
-xlabel('Information gain (IG)');
-ylabel('SNPRank score');
-title([strrep(resultsbase,'_', '\_') ' score vs. IG, gamma = ' num2str(gamma)])
-if capturedata
-    saveas(scorevig, [resultsbase '-IG-scatter' num2str(gamma) '.eps'], 'psc2')
+    % Scatter plot of SNPrank score vs. node degree
+    figure(2)
+    scorevdeg = scatter(colsum, r);
+    xlabel('degree');
+    ylabel('SNPRank score');
+    title([strrep(resultsbase,'_', '\_') ' score vs. degree, gamma = ' num2str(gamma)])
+    if capturedata
+        saveas(scorevdeg, [resultsbase '-degree-scatter' num2str(gamma) '.eps'], 'psc2')
+    end
+
+    % Scatter plot of SNPrank score vs. information gain (IG)
+    figure(3)
+    scorevig = scatter(Gdiag, r);
+    xlabel('Information gain (IG)');
+    ylabel('SNPRank score');
+    title([strrep(resultsbase,'_', '\_') ' score vs. IG, gamma = ' num2str(gamma)])
+    if capturedata
+        saveas(scorevig, [resultsbase '-IG-scatter' num2str(gamma) '.eps'], 'psc2')
+    end
 end
 
 % Print SNPs in SNPrank order
@@ -111,11 +118,11 @@ if capturedata
     fid = fopen([resultsbase '-' num2str(gamma) '.txt'], 'w');
 end
 [~,q] = sort(-r);
-fprintf(fid,'SNP\tSNPrank\tIG (main effect)\tdegree\n');
+fprintf(fid,'SNP\tSNPrank\tIG\n');
 for k = 1:n
   j = q(k);
-  fprintf(fid,'%s\t%8.4f\t%8.4f\t %4.0f\n', ...
-     SNPs{j}, r(j), G(j,j), colsum(j));
+  fprintf(fid,'%s\t%8.4f\t%8.4f\t\n', ...
+     SNPs{j}, r(j), G(j,j));
 end
 if capturedata
     fclose(fid);
