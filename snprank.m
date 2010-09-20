@@ -1,11 +1,10 @@
 function snprank(datafile, gamma, capturedata, showgraphs)
 % SNPrank - SNP ranking algorithm
 
-% Uses SNP names (SNPs) and adjacency matrix G produced by parsefile,
-% together with a damping factor gamma, (default is .85), to compute 
-% SNPrank scores.
+% Uses SNP names (SNPs) and adjacency matrix G, together with a 
+% damping factor gamma, (default is .85), to compute SNPrank scores.
 % Prints a series of rows containing the SNP name, SNPrank score,
-% information gain, and degree, sorted in descending order by SNPrank.
+% information gain, sorted in descending order by SNPrank.
 %
 % Usage:  snprank('gain-matrix.txt');
 % Authors:  Brett McKinney and Nick Davis
@@ -121,7 +120,7 @@ end
 fprintf(fid,'SNP\tSNPrank\tIG\n');
 for k = 1:n
   j = q(k);
-  fprintf(fid,'%s\t%8.6f\t%8.6f\t\n', ...
+  fprintf(fid,'%s\t%8.6f\t%8.6f\n', ...
      SNPs{j}, r(j), G(j,j));
 end
 if capturedata
