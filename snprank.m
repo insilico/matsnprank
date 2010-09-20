@@ -121,7 +121,7 @@ end
 fprintf(fid,'SNP\tSNPrank\tIG\n');
 for k = 1:n
   j = q(k);
-  fprintf(fid,'%s\t%8.4f\t%8.4f\t\n', ...
+  fprintf(fid,'%s\t%8.6f\t%8.6f\t\n', ...
      SNPs{j}, r(j), G(j,j));
 end
 if capturedata
