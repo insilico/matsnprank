@@ -18,7 +18,7 @@ and interested parties.
 matsnprank is developed and tested on 64-bit Linux (Ubuntu), but should work on any 
 platform supported by Matlab (Matlab R2010a tested).
 
-A GPU can be used for accelerated matrix computations.  [Jacket] 
+A GPU can be used for accelerated matrix computations.  [Jacket]
 (http://www.accelereyes.com), a commercial Matlab GPU engire, is required.
 See the Jacket site for more details on supported hardware and software 
 environments.
