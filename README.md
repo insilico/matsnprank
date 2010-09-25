@@ -18,10 +18,9 @@ and interested parties.
 matsnprank is developed and tested on 64-bit Linux (Ubuntu), but should work on any 
 platform supported by Matlab (Matlab R2010a tested).
 
-A GPU can be used for accelerated matrix computations.  [Jacket]
-(http://www.accelereyes.com), a commercial Matlab GPU engire, is required.
-See the Jacket site for more details on supported hardware and software 
-environments.
+A GPU can be used for accelerated matrix computations.  [Jacket](http://www.accelereyes.com), 
+a commercial Matlab GPU engine, is required.  See the Jacket site for more 
+details on supported hardware and software environments.
 
 To run snprank, open the Matlab environment and run:
 
@@ -29,10 +28,10 @@ To run snprank, open the Matlab environment and run:
 
 Additional parameters include:
 
-* gamma, the damping factor (default is 0.85)
-* capturedata, when enabled plots and output are saved 
-* showgraphs, when enabled plots are displayed 
-* usegpu, enables GPU computing (requires Jacket by Accelereyes)
+* `gamma`, the damping factor (default is 0.85)
+* `capturedata`, when enabled plots and output are saved 
+* `showgraphs`, when enabled plots are displayed 
+* `usegpu`, enables GPU computing (requires Jacket by Accelereyes)
 
 ### Contributors ###
 See AUTHORS file.
